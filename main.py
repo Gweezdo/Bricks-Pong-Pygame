@@ -29,6 +29,23 @@ class Paddle(pygame.sprite.Sprite):
         print(f'left: {self.rect.left}')
         print(f'x_pos: {self.x_pos}')
 
+class Ball(pygame.sprite.Sprite):
+    
+    def __init__(self):
+        super().__init__()
+        self.width = 10
+        self.height = 10
+        self.x_pos = 200
+        self.y_pos = 150
+        self.center_pos = ()
+        self.color = (0, 255, 0)
+        self.image = pygame.Surface((self.width, self.height))
+        self.image.fill(self.color)
+        self.rect = self.image.get_rect(midbottom = (self.x_pos, self.y_pos))
+
+
+
+
 pygame.init()
 screen = pygame.display.set_mode((RES_WIDTH,RES_HEIGHT))
 clock = pygame.time.Clock()
