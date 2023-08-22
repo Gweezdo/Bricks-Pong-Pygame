@@ -18,12 +18,13 @@ class Game():
         self.game_border = pygame.Rect(50, 50, RES_WIDTH-100, RES_HEIGHT-100)
 
         # Paddle
-        self.paddle = pygame.sprite.GroupSingle()
-        self.paddle.add(Paddle())
+        # self.paddle = pygame.sprite.GroupSingle()
+        # self.paddle.add(Paddle())
 
         # Ball
-        self.ball = pygame.sprite.GroupSingle()
-        self.ball.add(Ball())
+        self.ball = pygame.sprite.Group()
+        sprite_ball = Ball()
+        self.ball.add(sprite_ball)
 
     def run(self):
         while self.running:
@@ -31,18 +32,19 @@ class Game():
                 if event.type == pygame.QUIT:
                     self.running = False
             
-            # self.screen.fill('purple')
+            self.screen.fill('purple')
             pygame.draw.rect(self.screen, (255,255,255),self.game_border, GAME_BORDER_THICKNESS, 10)
 
             # Paddle
-            self.paddle.draw(self.screen)
-            self.paddle.update()
+            # self.paddle.draw(self.screen)
+            # self.paddle.update()
 
             # Ball
             self.ball.draw(self.screen)
-            self.ball.update(self.screen)
+            self.ball.update()
 
-            pygame.display.update()
+            pygame.display.flip()
+
             self.clock.tick(60)
 
         pygame.quit()

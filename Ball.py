@@ -5,28 +5,31 @@ class Ball(pygame.sprite.Sprite):
     
     def __init__(self):
         super().__init__()
-        # self.screen = screen
-        self.width = 10
-        self.height = 10
+        self.width = 100
+        self.height = 100
         self.x_velocity = 3
         self.y_velocity = 5
-        self.center_pos = (200,150)
+        self.x_pos = 200
+        self.y_pos = 150
         self.radius = self.width/2
+        self.color = (0, 0, 0)
 
-        self.color = (0, 255, 0)
         self.image = pygame.Surface((self.width, self.height))
         self.image.fill((255,0,0))
-        self.image.set_colorkey((255,0,0))
-        self.rect = self.image.get_rect(center = (self.center_pos[0], self.center_pos[1]))
+        # self.image.set_colorkey((255,0,0))
+        pygame.draw.circle(self.image, self.color, (0, 0), 25)
+        self.rect = self.image.get_rect()
+        self.rect.center = (self.x_pos, self.y_pos)
 
     def bouncing(self):
-        self.rect.x += self.x_velocity
-        self.rect.y += self.y_velocity
+        self.x_pos += self.x_velocity
+        self.y_pos += self.y_velocity
 
     
-    def update(self, screen):
-        pygame.draw.circle(screen, self.color, self.center_pos, self.radius, 0)
-        # self.rect = self.image.get_rect(center = (self.center_pos[0], self.center_pos[1]))
+    # def update(self, screen):
+    #     pygame.draw.circle(self.image, self.color, (self.x_pos, self.y_pos), self.radius, 0)
+    #     self.rect = self.image.get_rect(center = (self.x_pos, self.y_pos))
+    #     self.bouncing()
         
         # pygame.draw.circle(self.image,self.color,self.center_pos,self.radius, 0)
     
