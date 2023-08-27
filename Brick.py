@@ -13,16 +13,15 @@ class Brick(pygame.sprite.Sprite):
         self.strength = strength #int how many times to hit before break
 
         self.width = 98
-        self.height = 50
+        self.height = 20
         self.image = pygame.Surface((self.width, self.height))
         self.image.fill(color)
 
         self.rect = self.image.get_rect(center = (self.x_pos, self.y_pos))
 
-
     def update(self):
         self.rect = self.image.get_rect(center = (self.x_pos, self.y_pos))
     
-    @classmethod
-    def brick_factory(cls, map):
+    # @classmethod
+    # def brick_factory(cls, row):
 

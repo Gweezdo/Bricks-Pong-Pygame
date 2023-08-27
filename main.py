@@ -4,6 +4,7 @@ from sys import exit
 from Paddle import Paddle
 from constants import *
 from Ball import Ball
+from Brick import Brick
 
 
 class Game():
@@ -14,6 +15,7 @@ class Game():
         self.clock = pygame.time.Clock()
         self.running = True
         self.game_border = pygame.Rect(GAME_BORDER_PADDING_X, GAME_BORDER_PADDING_Y, GAME_BORDER_WIDTH, GAME_BORDER_HEIGHT)
+        self.play_ball = False
 
         # Paddle
         self.paddle = pygame.sprite.GroupSingle()
@@ -21,15 +23,17 @@ class Game():
 
         # Ball
         self.ball = pygame.sprite.GroupSingle()
-        self.ball.add(Ball())
+        self.ball.add(Ball(200, 531))
 
         self.map = [[1,1,1,1,1,1,1],
                     [1,1,1,1,1,1,1],
                     [1,1,1,1,1,1,1]]    
-        self.bricks = self.brick_factory(self.map)
+        # self.bricks = self.brick_factory(self.map)
+
+        self.brick = pygame.sprite.GroupSingle()
+        self.brick.add(Brick(100,100,(67,34,14),2))
 
    
-
     def paddle_movement(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT] and self.paddle.sprite.rect.left >= (GAME_BORDER_THICKNESS + GAME_BORDER_PADDING_X):
@@ -38,32 +42,35 @@ class Game():
             self.paddle.sprite.x_pos += 8
 
     def ball_bouncing(self):
+        if self.play_ball:
+        #Colission with paddle
+            collide_tolerance = 10
+            if pygame.sprite.collide_rect(self.paddle.sprite,self.ball.sprite): 
+                if abs(self.paddle.sprite.rect.top - self.ball.sprite.rect.bottom) < collide_tolerance:
+                    # print(f'Top: {self.paddle.sprite.rect.top}, Bottom:{self.ball.sprite.rect.bottom}')
+                    self.ball.sprite.y_velocity *= -1
+                    # print(f'{self.ball.sprite.y_velocity}')
 
-        collide_tolerance = 10
-        if pygame.sprite.collide_rect(self.paddle.sprite,self.ball.sprite): 
-            if abs(self.paddle.sprite.rect.top - self.ball.sprite.rect.bottom) < collide_tolerance:
-                print(f'Top: {self.paddle.sprite.rect.top}, Bottom:{self.ball.sprite.rect.bottom}')
+            #Colission with border
+            if self.ball.sprite.rect.right >= RES_WIDTH-GAME_BORDER_PADDING_X:
+                self.ball.sprite.x_velocity *= -1
+            if self.ball.sprite.rect.bottom >= RES_HEIGHT-GAME_BORDER_PADDING_Y:
+                # self.ball.sprite.y_velocity *= -1
+                self.running = False
+            if self.ball.sprite.rect.left <= GAME_BORDER_PADDING_X:
+                self.ball.sprite.x_velocity *= -1
+            if self.ball.sprite.rect.top <= GAME_BORDER_PADDING_Y:
                 self.ball.sprite.y_velocity *= -1
-                print(f'{self.ball.sprite.y_velocity}')
-                # print('collide')
-        
-        colliding_sprites = pygame.sprite.spritecollide(self.ball.sprite, all_sprites, False)
-    
-        if colliding_sprites:
-            print("Collision detected with:", [sprite for sprite in colliding_sprites])
 
-        if self.ball.sprite.rect.right >= RES_WIDTH-GAME_BORDER_PADDING_X:
-            self.ball.sprite.x_velocity *= -1
-        if self.ball.sprite.rect.bottom >= RES_HEIGHT-GAME_BORDER_PADDING_Y:
-            self.ball.sprite.y_velocity *= -1
-        if self.ball.sprite.rect.left <= GAME_BORDER_PADDING_X:
-            self.ball.sprite.x_velocity *= -1
-        if self.ball.sprite.rect.top <= GAME_BORDER_PADDING_Y:
-            self.ball.sprite.y_velocity *= -1
-
-        self.ball.sprite.x_pos += self.ball.sprite.x_velocity
-        self.ball.sprite.y_pos += self.ball.sprite.y_velocity
-        
+            self.ball.sprite.x_pos += self.ball.sprite.x_velocity
+            self.ball.sprite.y_pos += self.ball.sprite.y_velocity
+        else:
+            # Ball moves with paddle untill spacebar is pressed
+            self.ball.sprite.x_pos = self.paddle.sprite.x_pos
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_SPACE]:
+                self.play_ball = True
+                
 
     def run(self):
         while self.running:
@@ -71,19 +78,22 @@ class Game():
                 if event.type == pygame.QUIT:
                     self.running = False
             
-            self.screen.fill('purple')
+            self.screen.fill('blue')
             pygame.draw.rect(self.screen, (255,255,255),self.game_border, GAME_BORDER_THICKNESS, 10)
-
-            self.ball_bouncing()
 
             # Paddle
             self.paddle.draw(self.screen)
             self.paddle_movement()
             self.paddle.update()
 
+            self.ball_bouncing()
             # Ball
             self.ball.draw(self.screen)
             self.ball.update()
+
+            # Brick
+            self.brick.draw(self.screen)
+            self.brick.update()
 
             pygame.display.flip()
 
