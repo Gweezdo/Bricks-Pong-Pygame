@@ -25,14 +25,20 @@ class Game():
         self.ball = pygame.sprite.GroupSingle()
         self.ball.add(Ball(200, 531))
 
-        self.map = [[1,1,1,1,1,1,1],
-                    [1,1,1,1,1,1,1],
-                    [1,1,1,1,1,1,1]]    
-        # self.bricks = self.brick_factory(self.map)
+        self.map = [[1,1,1,1,1,1,1,1,1,1,1,1],
+                    [1,1,1,1,1,1,1,1,1,1,1,1],
+                    [1,1,1,1,1,1,1,1,1,1,1,1]]    
+        self.brick=self.brick_factory(self.map)
 
-        self.brick = pygame.sprite.GroupSingle()
-        self.brick.add(Brick(100,100,(67,34,14),2))
+    def brick_factory(self, map):
+        brick_group = pygame.sprite.Group()
 
+        for row_index, row in enumerate(map, start=1):
+            for brick_index, brick in enumerate(row, start=0):
+                print(f'row_index:{row_index}, brick_index: {brick_index}, brick: {brick}')
+                brick_group.add(Brick(GAME_BORDER_PADDING_X+GAME_BORDER_THICKNESS+(brick_index*59),(100+(row_index*17))))
+        
+        return brick_group
    
     def paddle_movement(self):
         keys = pygame.key.get_pressed()
