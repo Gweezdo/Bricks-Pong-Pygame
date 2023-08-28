@@ -25,32 +25,45 @@ class Game():
         self.ball = pygame.sprite.GroupSingle()
         self.ball.add(Ball(200, 531))
 
-        self.map = [[1,1,1,1,1,1,1,1,1,1,1,1],
-                    [1,1,1,1,1,1,1,1,1,1,1,1],
+        self.map = [[1,1,1,1,0,0,0,0,1,1,1,1],
+                    [1,1,1,1,0,0,0,0,1,1,1,1],
                     [1,1,1,1,1,1,1,1,1,1,1,1]]    
-        self.brick=self.brick_factory(self.map)
+        self.bricks=self.brick_factory(self.map)
 
     def brick_factory(self, map):
         brick_group = pygame.sprite.Group()
 
         for row_index, row in enumerate(map, start=1):
             for brick_index, brick in enumerate(row, start=0):
-                print(f'row_index:{row_index}, brick_index: {brick_index}, brick: {brick}')
-                brick_group.add(Brick(GAME_BORDER_PADDING_X+GAME_BORDER_THICKNESS+(brick_index*59),(100+(row_index*17))))
+                if brick == 1:
+                    # print(f'row_index:{row_index}, brick_index: {brick_index}, brick: {brick}')
+                    brick_group.add(Brick(GAME_BORDER_PADDING_X+GAME_BORDER_THICKNESS+(brick_index*59),(100+(row_index*17))))
         
         return brick_group
    
     def paddle_movement(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT] and self.paddle.sprite.rect.left >= (GAME_BORDER_THICKNESS + GAME_BORDER_PADDING_X):
-            self.paddle.sprite.x_pos -= 8
+            self.paddle.sprite.x_pos -= 6
         elif keys[pygame.K_RIGHT] and self.paddle.sprite.rect.right <= (RES_WIDTH - (GAME_BORDER_THICKNESS + GAME_BORDER_PADDING_X)):
-            self.paddle.sprite.x_pos += 8
+            self.paddle.sprite.x_pos += 6 
 
     def ball_bouncing(self):
         if self.play_ball:
-        #Colission with paddle
+
             collide_tolerance = 10
+            #Colission with bricks
+            collide_list = pygame.sprite.spritecollide(self.ball.sprite, self.bricks, True)
+            if collide_list:
+                for brick in collide_list:
+                    if (abs(self.ball.sprite.rect.top - brick.rect.bottom) < collide_tolerance) or (abs(self.ball.sprite.rect.bottom - brick.rect.top) < collide_tolerance):
+                        print('colission')
+                        self.ball.sprite.y_velocity *= -1
+                    if (abs(self.ball.sprite.rect.left - brick.rect.right) < collide_tolerance) or (abs(self.ball.sprite.rect.right - brick.rect.left) < collide_tolerance):
+                        print('colission')
+                        self.ball.sprite.x_velocity *= -1
+
+            #Colission with paddle
             if pygame.sprite.collide_rect(self.paddle.sprite,self.ball.sprite): 
                 if abs(self.paddle.sprite.rect.top - self.ball.sprite.rect.bottom) < collide_tolerance:
                     # print(f'Top: {self.paddle.sprite.rect.top}, Bottom:{self.ball.sprite.rect.bottom}')
@@ -61,8 +74,8 @@ class Game():
             if self.ball.sprite.rect.right >= RES_WIDTH-GAME_BORDER_PADDING_X:
                 self.ball.sprite.x_velocity *= -1
             if self.ball.sprite.rect.bottom >= RES_HEIGHT-GAME_BORDER_PADDING_Y:
-                # self.ball.sprite.y_velocity *= -1
-                self.running = False
+                self.ball.sprite.y_velocity *= -1
+                # self.running = False
             if self.ball.sprite.rect.left <= GAME_BORDER_PADDING_X:
                 self.ball.sprite.x_velocity *= -1
             if self.ball.sprite.rect.top <= GAME_BORDER_PADDING_Y:
@@ -98,8 +111,8 @@ class Game():
             self.ball.update()
 
             # Brick
-            self.brick.draw(self.screen)
-            self.brick.update()
+            self.bricks.draw(self.screen)
+            self.bricks.update()
 
             pygame.display.flip()
 
