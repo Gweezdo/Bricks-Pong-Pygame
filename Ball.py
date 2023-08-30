@@ -22,8 +22,11 @@ class Ball(pygame.sprite.Sprite):
         pygame.draw.circle(self.image, self.color, (self.width/2, self.height/2), self.radius)
         self.rect = self.image.get_rect(midbottom = (self.x_pos, self.y_pos))
         # self.rect.center = (self.x_pos, self.y_pos)
+
+        self.rect_old = self.rect.copy()
     
     def update(self):
+        self.rect_old = self.rect.copy()
         self.rect = self.image.get_rect(midbottom = (self.x_pos, self.y_pos))
         # self.bouncing()
         # print(f'y_pos: {self.y_pos}')
