@@ -1,5 +1,6 @@
 import pygame
 from sys import exit
+import time
 
 from Paddle import Paddle
 from constants import *
@@ -13,6 +14,7 @@ class Game():
     def __init__(self):
         pygame.init()
         self.screen = pygame.display.set_mode((RES_WIDTH,RES_HEIGHT))
+        pygame.display.set_caption("Brick Pong")
         self.clock = pygame.time.Clock()
         self.running = True
         self.game_border = pygame.Rect(GAME_BORDER_PADDING_X, GAME_BORDER_PADDING_Y, GAME_BORDER_WIDTH, GAME_BORDER_HEIGHT)
@@ -57,14 +59,9 @@ class Game():
         
         return brick_group
    
-    def paddle_movement(self):
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT] and self.paddle.sprite.rect.left >= (GAME_BORDER_THICKNESS + GAME_BORDER_PADDING_X):
-            self.paddle.sprite.x_pos -= 6
-        elif keys[pygame.K_RIGHT] and self.paddle.sprite.rect.right <= (RES_WIDTH - (GAME_BORDER_THICKNESS + GAME_BORDER_PADDING_X)):
-            self.paddle.sprite.x_pos += 6 
+    
 
-    def ball_bouncing(self):
+    def ball_bouncing(self, dt):
         if self.play_ball:
 
             collide_tolerance = 10
@@ -82,9 +79,9 @@ class Game():
             #Colission with paddle
             if pygame.sprite.collide_rect(self.paddle.sprite,self.ball.sprite): 
                 if abs(self.paddle.sprite.rect.top - self.ball.sprite.rect.bottom) < collide_tolerance:
-                    # print(f'Top: {self.paddle.sprite.rect.top}, Bottom:{self.ball.sprite.rect.bottom}')
+                    print(f'Top: {self.paddle.sprite.rect.top}, Bottom:{self.ball.sprite.rect.bottom}')
                     self.ball.sprite.y_velocity *= -1
-                    # print(f'{self.ball.sprite.y_velocity}')
+                    print(f'{self.ball.sprite.y_velocity}')
 
             #Colission with border
             if self.ball.sprite.rect.right >= RES_WIDTH-GAME_BORDER_PADDING_X:
@@ -101,8 +98,11 @@ class Game():
             if self.ball.sprite.rect.top <= GAME_BORDER_PADDING_Y:
                 self.ball.sprite.y_velocity *= -1
 
-            self.ball.sprite.x_pos += self.ball.sprite.x_velocity
-            self.ball.sprite.y_pos += self.ball.sprite.y_velocity
+            self.ball.sprite.pos.x += self.ball.sprite.x_velocity * dt
+            self.ball.sprite.x_pos = round(self.ball.sprite.pos.x)
+
+            self.ball.sprite.pos.y += self.ball.sprite.y_velocity * dt
+            self.ball.sprite.y_pos = round(self.ball.sprite.pos.y)
         else:
             # Ball moves with paddle untill spacebar is pressed
             self.ball.sprite.x_pos = self.paddle.sprite.x_pos
@@ -113,24 +113,29 @@ class Game():
                 
 
     def run(self):
+        previous_time = time.time()
         while self.running:
+            #Specify delta time for framerate controll
+            dt = time.time() - previous_time
+            previous_time = time.time()
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
             
             #Do logical updates here
-            self.paddle.update()
-            self.ball_bouncing()
+            self.paddle.update(dt)
+            self.ball_bouncing(dt)
             self.ball.update()
             self.bricks.update()
-            self.paddle_movement()
+            # self.paddle_movement(dt)
 
             #Fill screen with solid colour
             self.screen.fill('blue')
             
             #Render graphics here
             pygame.draw.rect(self.screen, (255,255,255),self.game_border, GAME_BORDER_THICKNESS, 10)
-            pygame.draw.rect(self.screen, (255,0,0),self.ball.sprite.rect_old)
+            # pygame.draw.rect(self.screen, (255,0,0),self.ball.sprite.rect_old)
 
             self.display_lives()
             self.paddle.draw(self.screen) 
@@ -144,10 +149,12 @@ class Game():
 
 
             pygame.display.flip()
-            self.clock.tick(60)
+            # self.clock.tick(60)
             
         pygame.quit()
         exit()
-    
-Game().run()
+
+if __name__ == '__main__':
+    game = Game()    
+    game.run()
 
