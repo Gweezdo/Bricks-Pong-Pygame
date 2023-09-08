@@ -9,7 +9,7 @@ class Brick(pygame.sprite.Sprite):
 
         self.x_pos = x_pos
         self.y_pos = y_pos
-        self.color = (0,255,0)#color
+        self.color = (247, 167, 62)#color
         self.strength = 1 #strength #int how many times to hit before break
 
         self.width = 57

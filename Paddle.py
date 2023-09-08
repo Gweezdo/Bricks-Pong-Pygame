@@ -18,19 +18,21 @@ class Paddle(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(topleft = (self.x_pos, self.y_pos))
         self.pos = pygame.math.Vector2(self.rect.topleft)
         # self.rect_pos = self.rect.x
+        self.rect_old = self.rect.copy()
 
     def move(self, dt):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT] and self.rect.left >= (GAME_BORDER_THICKNESS + GAME_BORDER_PADDING_X):
             self.pos.x -= self.speed * dt
             self.x_pos = round(self.pos.x)
-            print(self.rect.x)
+            print(self.x_pos)
         if keys[pygame.K_RIGHT] and self.rect.right <= (RES_WIDTH - (GAME_BORDER_THICKNESS + GAME_BORDER_PADDING_X)):
             self.pos.x += self.speed * dt
             self.x_pos = round(self.pos.x)
-            print(self.rect.x)
+            print(self.x_pos)
     
     def update(self, dt):
+        self.rect_old = self.rect.copy()
         self.move(dt)
         self.rect = self.image.get_rect(midbottom = (self.x_pos, self.y_pos))
         # self.rect_pos = self.rect.x
